@@ -1,3 +1,4 @@
+import gsap from 'gsap';
 // Get DOM elements
 const dock = document.querySelector(".dock"); // The dock container at the bottom
 const icons = document.querySelectorAll(".icon"); // Individual icons inside the dock
@@ -23,6 +24,7 @@ trigger.addEventListener("mouseenter", () => {
 // Mouse leaves the trigger
 trigger.addEventListener("mouseleave", () => {
   isTriggerHovered = false;
+  isDockVisible = false;
 
   // If the dock isn’t being hovered either, hide it after a short delay
   setTimeout(() => {
@@ -43,7 +45,7 @@ dock.addEventListener("mouseleave", () => {
 
 // Mouse moves inside the dock — used for proximity-based scaling
 dock.addEventListener("mousemove", (e) => {
-  if (!isDockVisible || !isDockHovered || !isReadyForHover) return;
+  if (isDockVisible || !isDockHovered || !isReadyForHover) return;
 
   const rect = dock.getBoundingClientRect();
   const centerX = e.clientX - rect.left;
@@ -58,5 +60,30 @@ dock.addEventListener("mousemove", (e) => {
     const scale = Math.max(1, 1.7 - distance / maxDistance);
 
     // We'll animate this part using GSAP later
+    gsap.to(icon, {
+      opacity: 1,
+      scale,
+      duration: 1,
+      ease: 'power2.out'
+    })
   });
 });
+
+const showDock = () => {
+  gsap.to(dock, {
+    bottom: 150,
+    duration: 0.75,
+    ease: 'power2.out',
+    onComplete: () => {
+      isReadyForHover = true
+    }
+  })
+}
+
+const hideDock = () => {
+  gsap.to(dock, {
+    bottom: -150,
+    duration: 0.75,
+    ease: 'power2.out',
+  })
+}
